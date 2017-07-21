@@ -1,0 +1,44 @@
+#me {
+
+	border-radius: 50%;
+	max-width: 150px;
+	height: auto;
+}
+#maintext {
+	font-size: 100px;
+	font-family: "Roboto";
+	display: none;
+}
+#wrapper {
+	padding-top: 10px;
+	background-image: url("./img/bg.jpg");
+	background-repeat: no-repeat;
+
+}
+#intro-body {
+	font-family: "Roboto";
+	font-size: 20px;
+	display: none;
+}
+.ficons {
+	font-size: 17px;
+	-o-transition:.5s;
+	-ms-transition:.5s;
+	-moz-transition:.5s;
+	-webkit-transition: .5s;
+	transition: 0.25s;
+}
+.ficons:hover {
+	font-size: 24px;
+	-o-transition:.5s;
+	-ms-transition:.5s;
+	-moz-transition:.5s;
+	-webkit-transition:.5s;
+	transition: .25s;
+}
+.icon-cog {
+	color: black;
+}
+.icon {
+	padding: 10px 10px 10px 10px;
+}
