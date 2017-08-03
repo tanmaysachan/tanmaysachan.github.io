@@ -5,7 +5,7 @@
 	height: auto;
 }
 #maintext {
-	font-size: 100px;
+	font-size: 7em;
 	font-family: "Roboto";
 	display: none;
 }
@@ -17,7 +17,7 @@
 }
 #intro-body {
 	font-family: "Roboto";
-	font-size: 20px;
+	font-size: 2em;
 	display: none;
 }
 .ficons {
