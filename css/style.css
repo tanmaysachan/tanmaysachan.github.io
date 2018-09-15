@@ -37,7 +37,7 @@ hr {
 	transition: 0.25s;
 }
 .ficons:hover {
-	font-size: 24px;
+	font-size: 20px;
 	-o-transition:.5s;
 	-ms-transition:.5s;
 	-moz-transition:.5s;
@@ -48,5 +48,5 @@ hr {
 	color: black;
 }
 .icon {
-	padding: 10px 10px 10px 10px;
+	padding:10px;
 }
