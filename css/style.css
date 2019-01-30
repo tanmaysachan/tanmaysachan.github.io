@@ -7,7 +7,8 @@ body {
 hr {
 	border-color: black;
 }
-#me {
+//comment by sumanth
+#me { 
 	border-radius: 50%;
 	max-width: 150px;
 	height: auto;
