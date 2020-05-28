@@ -1,9 +1,11 @@
 import React from 'react';
 import Link from 'gatsby-link';
 import { withStyles } from '@material-ui/styles';
-import { FaBars } from 'react-icons/fa';
+import { FaBars, FaFileDownload } from 'react-icons/fa';
 
 import styles from './style';
+
+import resume from 'images/Resume.pdf';
 
 type Props = {
   classes: Object,
@@ -24,10 +26,20 @@ const MobileNavigation = ({ classes, options, onClick, open }: Props) => (
               className={classes.navLink}
               activeClassName={classes.navLinkActive}
               exact={'true'}>
-              <span>{link.text}</span>
+              <span>{link.text}{link.text === 'Resume' ? <FaFileDownload /> : "" }</span>
             </Link>
           </div>
         ))}
+        {/*hardcoded values change it in main and mobile for key!!!!!!!!!!*/}
+        <li className={classes.menuContainer} key={3}>
+          <a
+            href={resume}
+            className={classes.navLink}
+            target="_blank"
+            download>
+            <span>Resume<FaFileDownload /></span>
+          </a>
+        </li>
       </div>
     )}
   </>
