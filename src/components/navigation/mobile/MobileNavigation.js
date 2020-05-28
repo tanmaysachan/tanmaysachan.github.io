@@ -26,20 +26,10 @@ const MobileNavigation = ({ classes, options, onClick, open }: Props) => (
               className={classes.navLink}
               activeClassName={classes.navLinkActive}
               exact={'true'}>
-              <span>{link.text}{link.text === 'Resume' ? <FaFileDownload /> : "" }</span>
+              <span>{link.text}</span>
             </Link>
           </div>
         ))}
-        {/*hardcoded values change it in main and mobile for key!!!!!!!!!!*/}
-        <li className={classes.menuContainer} key={3}>
-          <a
-            href={resume}
-            className={classes.navLink}
-            target="_blank"
-            download>
-            <span>Resume<FaFileDownload /></span>
-          </a>
-        </li>
       </div>
     )}
   </>
