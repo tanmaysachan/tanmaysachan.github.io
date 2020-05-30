@@ -15,7 +15,7 @@ const content = {
       newTab: true,
     },
     {
-      to: 'www.linkedin.com/in/tanmay-sachan-9b4a32166',
+      to: 'https://www.linkedin.com/in/tanmay-sachan-9b4a32166',
       text: 'Tanmay Sachan',
       Icon: FaLinkedin,
       newTab: true,
