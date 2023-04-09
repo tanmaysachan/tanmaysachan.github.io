@@ -7,7 +7,6 @@ window.onload = function() {
                 setTimeout(retrieveStorage, 500);
             } else {
                 contentLink = localStorage.getItem('content_link')
-                console.log(contentLink);
             }
             return contentLink;
         }
@@ -41,17 +40,24 @@ window.onload = function() {
         fetch(postsUrl)
         .then( res => res.json() )
         .then( data => {
-            console.log(data)
+            for (var i = 0; i < data.length; i++) {
+                data[i].rank = parseInt(data[i].name.split('.')[0]);
+            }
+            // Sort by rank
+            // TODO: find a better way to do this lol
+            data.sort(function(a, b) {
+                return b.rank - a.rank;
+            });
             data.forEach(element => {
                 var newListItem = document.createElement("li");
                 var newListItemText = document.createTextNode(element.name);
                 var newListItemText = document.createElement("a");
-                newListItemText.innerText = element.name.slice(0, -3);
+                // Remove the suffix and the number from the front
+                newListItemText.innerText = element.name.slice(0, -3).split('.').slice(1).join('.');
                 newListItemText.href = "post.html";
                 var contentLink = rawContentUrl + element.name;
                 newListItemText.onclick = function () {
                     localStorage.setItem('content_link', contentLink);
-                    console.log(localStorage.getItem('content_link'));
                 }
                 newListItem.appendChild(newListItemText);
                 myList.appendChild(newListItem);
