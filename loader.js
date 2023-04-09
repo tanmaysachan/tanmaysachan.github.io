@@ -24,6 +24,12 @@ window.onload = function() {
         .then(res => res.text())
         .then(data => {
             var htmlContent = converter.makeHtml(data);
+
+            // Convert underscores
+            // Just disallow italics for now (TODO: fix this)
+            htmlContent = htmlContent.replaceAll('<em>', '_');
+            htmlContent = htmlContent.replaceAll('</em>', '_');
+
             var postBlock = document.getElementById("post-block");
             postBlock.insertAdjacentHTML('beforeend', htmlContent);
             furtherFormat(postBlock, contentLink.split('/').at(-1));
