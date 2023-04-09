@@ -89,7 +89,7 @@ function furtherFormat(postBlock, postName) {
         console.log("Could not render math through katex");
     }
 
-    shareable_link = "https://github.com/tanmaysachan/tanmaysachan.github.io/blob/master/posts/" + encodeURIComponent(postName);
+    shareable_link = "https://github.com/tanmaysachan/tanmaysachan.github.io/blob/master/posts/" + postName;
     var shareable_tag = document.getElementById("shareable-link");
     shareable_tag.onclick = function () {
         try {
