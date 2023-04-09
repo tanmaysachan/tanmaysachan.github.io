@@ -1,0 +1,8 @@
+# How did transformers get this good?
+
+Back in 2018 when "Attention is all you need" [paper](https://arxiv.org/abs/1706.03762) was published no one had expected
+this architecture to take the NLP world by storm. And then it did. And not just NLP, but computer vision, speech processing,
+program synthesis.
+
+Fast forward to 2023, and ChatGPT has revolutionized work flows of people, with openAI's next iteration - GPT-4 - being rumored to take away many jobs owing
+to its high level reasoning capabilities and task automation potential.
