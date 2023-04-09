@@ -27,7 +27,7 @@ window.onload = function() {
             var htmlContent = converter.makeHtml(data);
             var postBlock = document.getElementById("post-block");
             postBlock.insertAdjacentHTML('beforeend', htmlContent);
-            furtherFormat();
+            furtherFormat(postBlock);
         })
 
     } else {
@@ -59,8 +59,18 @@ window.onload = function() {
     }
 }
 
-function furtherFormat() {
+function furtherFormat(postBlock) {
     // Find the first h1 element and colour it blue
     var firstH1 = document.getElementsByTagName("h1")[0];
     firstH1.style = "color: #1b95e0;";
+
+    // Run katex auto-render
+    window.renderMathInElement(postBlock, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false},
+            {left: "\\(", right: "\\)", display: false},
+            {left: "\\[", right: "\\]", display: true}
+        ]
+    });
 }
