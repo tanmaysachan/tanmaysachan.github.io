@@ -41,6 +41,7 @@ window.onload = function() {
         fetch(postsUrl)
         .then( res => res.json() )
         .then( data => {
+            console.log(data)
             data.forEach(element => {
                 var newListItem = document.createElement("li");
                 var newListItemText = document.createTextNode(element.name);

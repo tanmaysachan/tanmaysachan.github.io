@@ -12,3 +12,10 @@
     padding-left: 2em;
     padding-right: 2em;
 }
+#content-block {
+    padding-left: 2em;
+}
+#back-button {
+    font-size: 2em;
+    color: #1b95e0;
+}

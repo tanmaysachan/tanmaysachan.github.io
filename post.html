@@ -27,9 +27,14 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
         onload="renderMathInElement(document.body);"></script>
 
-
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="./assets/favicon_io/site.webmanifest">
 
     <script src="loader.js"></script>
+
+    <script src="https://kit.fontawesome.com/9016fec2c3.js" crossorigin="anonymous"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
     <title>A small collection</title>
@@ -37,8 +42,15 @@
   <body>
     <div class="container col-sm" id="site-header">
     </div>
-    <div class="container float-left" id="post-block" style="font-family: 'Rubik', sans-serif;">
-        <!--posts go here through js injection-->
+    <div class="row" id="content-block">
+      <div class="col-xs" id="back-button">
+        <a href="index.html"><i class="fa-solid fa-chevron-left"></i></a>
+      </div>
+      <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
+          <!--posts go here through js injection-->
+      </div>
+      <div class="col">
+      </div>
     </div>
 
     
