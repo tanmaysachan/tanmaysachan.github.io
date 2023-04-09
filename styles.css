@@ -17,5 +17,13 @@
 }
 #back-button {
     font-size: 2em;
-    color: #1b95e0;
+    color: #12708a;
+}
+#shareable-box {
+    padding-left: 5.5em;
+    padding-bottom: 1.5em;
+    font-size: small;
+}
+#shareable-link {
+    text-decoration: none;
 }
