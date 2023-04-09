@@ -55,7 +55,7 @@ window.onload = function() {
                 // Remove the suffix and the number from the front
                 newListItemText.innerText = element.name.slice(0, -3).split('.').slice(1).join('.');
                 newListItemText.href = "post.html";
-                var contentLink = rawContentUrl + element.name;
+                var contentLink = rawContentUrl + encodeURIComponent(element.name);
                 newListItemText.onclick = function () {
                     localStorage.setItem('content_link', contentLink);
                 }
@@ -89,7 +89,7 @@ function furtherFormat(postBlock, postName) {
         console.log("Could not render math through katex");
     }
 
-    shareable_link = "https://github.com/tanmaysachan/tanmaysachan.github.io/blob/master/posts/" + postName;
+    shareable_link = "https://github.com/tanmaysachan/tanmaysachan.github.io/blob/master/posts/" + encodeURIComponent(postName);
     var shareable_tag = document.getElementById("shareable-link");
     shareable_tag.onclick = function () {
         try {
