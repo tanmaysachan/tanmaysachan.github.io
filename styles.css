@@ -27,3 +27,6 @@
 #shareable-link {
     text-decoration: none;
 }
+pre.prettyprint {
+    border: none !important;
+}

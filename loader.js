@@ -80,6 +80,17 @@ function furtherFormat(postBlock, postName) {
     } catch(err) {
     }
 
+    // Prettify code blocks
+    try{
+        var codeBlocks = document.getElementsByTagName("pre");
+        for (var i = 0; i < codeBlocks.length; i++) {
+            codeBlocks[i].classList.add("prettyprint");
+            codeBlocks[i].classList.add("code-block");
+        }
+        PR.prettyPrint();
+    } catch(err) {
+    }
+
     // Run katex auto-render
     try {
         window.renderMathInElement(postBlock, {
