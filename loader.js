@@ -30,6 +30,9 @@ window.onload = function() {
             htmlContent = htmlContent.replaceAll('<em>', '_');
             htmlContent = htmlContent.replaceAll('</em>', '_');
 
+            spinner = document.getElementById("spinner");
+            spinner.style.display = "none";
+
             var postBlock = document.getElementById("post-block");
             postBlock.insertAdjacentHTML('beforeend', htmlContent);
             furtherFormat(postBlock, contentLink.split('/').at(-1));
@@ -68,6 +71,9 @@ window.onload = function() {
                 newListItem.appendChild(newListItemText);
                 myList.appendChild(newListItem);
             });
+
+            spinner = document.getElementById("spinner");
+            spinner.style.display = "none";
         });
     }
 }
