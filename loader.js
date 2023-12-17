@@ -43,7 +43,9 @@ function furtherFormat(postBlock, postPath) {
     var shareable_tag = document.getElementById("shareable-link");
     shareable_tag.onclick = function () {
         try {
-            navigator.clipboard.writeText(decodeURIComponent(postPath));
+            navigator.clipboard.writeText(
+                "https://tanmaysachan.github.io" + decodeURIComponent(postPath)
+            );
             shareable_tag.innerText = "Copied to clipboard :)";
         } catch (err) {
             shareable_tag.innerText = "Could not copy to clipboard :(";
