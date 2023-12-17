@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-console.log('Hello, world!');
+console.log('Hello, world!,');
 
 // const fs = require('fs');
 // const path = require('path');
