@@ -55,7 +55,52 @@
         <a href="../index.html"><i class="fa-solid fa-chevron-left"></i></a>
       </div>
       <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
-          <!-- POST_CONTENT -->
+          <h1 id="fastarraysummationwithcuda">Fast array summation with CUDA</h1>
+<p>Slowest to Fastest:  </p>
+<ol>
+<li>Naive atomic add with each thread.</li>
+<li><a href="https://en.wikipedia.org/wiki/Prefix_sum#Parallel_algorithms">Parallel reduction</a>.</li>
+<li>Removing slow operations (modulo in divergent branches).</li>
+<li>Use <code>2</code> with sequential addressing.</li>
+<li>Perform first reduction when reading globally.</li>
+</ol>
+<p>Further removing instruction bottlenecks:  </p>
+<ol start="6">
+<li>Bottleneck through loop overheads - unroll loops.  </li>
+<li>C++ CUDA has templating for compile time block size detection - can be used to fully unroll loops.  </li>
+</ol>
+<p>NUMBA code (possible off-by-1s):  </p>
+<pre><code class="python language-python">def reduce(out, a, size):
+    # TPB = threads per block
+    cache = cuda.shared.array(TPB, numba.float32)
+    i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
+    local_i = cuda.threadIdx.x
+
+    stride = TPB//2
+    # First reduction on global read
+    if i + stride &lt; size:
+        cache[local_i] = a[i] + a[i + stride]
+    cuda.syncthreads()
+
+    # Sequential addressing with thread-ids
+    while stride &gt; 32:
+        if local_i &lt; stride:
+            cache[local_i] = cache[local_i] + cache[local_i + stride]
+        cuda.syncthreads()
+        stride &gt;&gt;= 1
+
+    # Only 1 warp left, so no need to syncthreads()
+    if local_i &lt; 32:
+        if local_i + 32 &lt; TPB: cache[local_i] = cache[local_i] + cache[local_i + 32]
+        if local_i + 16 &lt; TPB: cache[local_i] = cache[local_i] + cache[local_i + 16]
+        if local_i + 8 &lt; TPB: cache[local_i] = cache[local_i] + cache[local_i + 8]
+        if local_i + 4 &lt; TPB: cache[local_i] = cache[local_i] + cache[local_i + 4]
+        if local_i + 2 &lt; TPB: cache[local_i] = cache[local_i] + cache[local_i + 2]
+        if local_i + 1 &lt; TPB: cache[local_i] = cache[local_i] + cache[local_i + 1]
+
+    if i == 0:
+        out = cache
+</code></pre>
       </div>
       <div id="not-mobile" class="col">
       </div>

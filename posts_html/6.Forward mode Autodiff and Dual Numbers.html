@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../styles.css">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    
+    <!-- Rubik font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+    <script src="../loader.js"></script>
+
+    <script src="https://kit.fontawesome.com/9016fec2c3.js" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autorun=false"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="../assets/favicon_io/site.webmanifest" crossorigin="use-credentials">
+
+    <title>A small collection</title>
+  </head>
+  <body>
+    <div class="container col-sm" id="site-header">
+    </div>
+    <div class="container row" id="shareable-box">
+      <div class="col">
+        <a id="shareable-link" href="javascript:void(0);"><i class="fa-solid fa-link"></i> Copy shareable github link for this write-up</a>
+      </div>
+    </div>
+    <div class="row" id="content-block">
+      <div class="col-xs" id="back-button">
+        <a href="../index.html"><i class="fa-solid fa-chevron-left"></i></a>
+      </div>
+      <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
+          <h1 id="forwardmodeautodiffanddualnumbers">Forward mode Autodiff and Dual Numbers</h1>
+<h3 id="forwardautodiff">Forward autodiff?</h3>
+<p>While we're familiar with backward mode autodiff due to the almightly backprop, its not the only
+way to auto differentiate.</p>
+<p>Before autodiff, we also have to consider the classical differentation procedures.</p>
+<ol>
+<li><p>Symbolic Differentiation<br />
+Too computationally intensive to obtain a closed form simplified expression.</p></li>
+<li><p>Finite difference method<br />
+The popular $\frac{d}{dx}f(x) = \lim_{h \to 0}\frac{f(x + h) - f(x)}{h}$ suffers from numerical instability.</p></li>
+</ol>
+<p>Both are slow for partial derivative computation with respect to many inputs. A more efficient and
+stable method for the same is to multiply a chain of jacobians through simple chain rule.</p>
+<p>If $x$ and $y$ are vectors, and -<br />
+$y = h(g(f(x)))$</p>
+<p>Then through chain rule,  </p>
+<p>\[\frac{\partial y}{\partial x} = \frac{\partial h(w_2)}{\partial w_2} \frac{\partial g(w_1)}{\partial w_1} \frac{\partial f(w_0)}{\partial x}\]</p>
+<p>Where $w_0 = x, w_1 = f(w_0), w_2 = g(w_1)$.</p>
+<p>Each of these terms in the chain rule equation form a jacobian for multi-variate inputs. Now,
+while backprop works by performing a top-down evaluation of this chain rule like so -  </p>
+<p>\[\frac{\partial y}{\partial x} = \left( \frac{\partial h(w_2)}{\partial w_2} \frac{\partial g(w_1)}{\partial w_1} \right) \frac{\partial f(w_0)}{\partial x}\]</p>
+<p>Forward prop would instead perform the following evaluation -   </p>
+<p>\[\frac{\partial y}{\partial x} = \frac{\partial h(w_2)}{\partial w_2} \left( \frac{\partial g(w_1)}{\partial w_1} \frac{\partial f(w_0)}{\partial x} \right)\]</p>
+<p>Now for complexity analysis, assume $x$ is a vector of size $N$ and $y$ is a vector of size $M$.</p>
+<ul>
+<li>A forward pass would calculate derivatives with respect to one independent input variable in
+one pass.  </li>
+<li>A backward pass would calculate derivatives with respect to one independent output variable in
+one pass.</li>
+</ul>
+<p>For a function $f: R^N \rightarrow R^M$, if $N &gt; M$, we can see that backward accumulation is
+more efficient. In the other case where $M &gt; N$, a forward accumulation is better. Neural
+networks belong to the first class of functions, and hence a backward propagation is required for
+efficiency.</p>
+<p>However, neither backward not forward accumulation are optimal. The optimal way of multiplying these
+jacobians is <a href="https://www.researchgate.net/publication/225112821_Optimal_Jacobian_accumulation_is_NP-complete">NP-Complete</a>.</p>
+<h3 id="dualnumbers">Dual Numbers</h3>
+<p>They are a class of numbers like the complex (i.e. $i^2 = -1$). In Dual number system, we assume the
+existence of $\epsilon^2 = 0$, where $\epsilon \neq 0$. All higher powers of $\epsilon$ are also $0$.</p>
+<p>A dual number is made up of a real and a dual part, and is represented as $a + b\epsilon$.</p>
+<p>A neat property of dual numbers arising from the <a href="https://en.wikipedia.org/wiki/Dual_number#Differentiation">taylor series expansion</a> is their ability to calculate derivatives through simple function application.  </p>
+<p>For example, to calculate the value and derivative of some function $f$ at $a$ we apply the function
+at $a + \epsilon$. This gives us -  </p>
+<p>$f(a + \epsilon) = f(a) + f'(a)\epsilon$</p>
+<p>(as the higher powers in the taylor expansion become 0)</p>
+<p>This simplifies the calculation of forward mode autodifferentiation and removes any overhead. Real
+numbers in the calculations are lifted to be dual numbers with dual part 0.</p>
+<h3 id="generalizingtohigherorderderivatives">Generalizing to higher order derivatives</h3>
+<p>While the standard dual numbers are helpful for first degree derivative calculation, we can extend
+them. Instead of using the definition where $\epsilon^2 = 0$, we can define $\epsilon^n = 0$, and
+it will help us calculate the (n-1)th derivative.</p>
+<p>For example, setting $n = 3$, we get the definition of a dual number as $\left(a + b\epsilon + c\epsilon^2\right)$. Evaluating a function at $\left(a + \epsilon + \epsilon^2\right)$ will give us -  </p>
+<p>$f(a + \epsilon + \epsilon^2) = f(a) + f'(a)\epsilon + \frac{f''(a)\epsilon^2}{2!}$  </p>
+<h3 id="implementationofdualnumbers">Implementation of dual numbers</h3>
+<p>dual numbers can be represented by a matrix -  </p>
+<p>\[a + b\epsilon = 
+\begin{pmatrix}
+a &amp; b \newline
+0 &amp; a
+\end{pmatrix}\]</p>
+<p>This representation satisfies all the dual number properties.</p>
+<p>Even the extensions of dual numbers for higher order derivatives can be represented by a similar
+matrix (upper-triangular diagonal-constant).</p>
+<p>\[a + b\epsilon + c\epsilon^2 = 
+\begin{pmatrix}
+a &amp; b &amp; c \newline
+0 &amp; a &amp; b \newline
+0 &amp; 0 &amp; a \newline
+\end{pmatrix} \text{for }  \epsilon^3 = 0\]</p>
+<p>Through this method, the complexity of derivative calculation becomes quadratic in the degree of
+the highest order derivative.</p>
+      </div>
+      <div id="not-mobile" class="col">
+      </div>
+    </div>
+
+    
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>

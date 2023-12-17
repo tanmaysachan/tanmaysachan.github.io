@@ -55,7 +55,27 @@
         <a href="../index.html"><i class="fa-solid fa-chevron-left"></i></a>
       </div>
       <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
-          <!-- POST_CONTENT -->
+          <h1 id="quantizedlora">Quantized LoRA</h1>
+<p>QLoRA is an attempt to further optimize finetuning of LLMs by doing it directly on quantized LLMs and letting the gradient updates happen to the LoRA adapters.</p>
+<h3 id="quickoverviewoflora">Quick overview of LoRA</h3>
+<p>LoRA is a technique to perform finetuning of LLMs without having to perform gradient updates on the entire parameter set (rather a much, much smaller subset).</p>
+<p>It makes use of the assumption that the change of weights matrix ($\Delta W$) for each layer in an LLM has a low rank. Formally, if a weight matrix in an LLM is $W_{a \times b}$,</p>
+<p>\[rank(\Delta W_{a \times b}) \ll a, b\]</p>
+<p>This can be exploited by creating smaller matrices $A_{a \times h}$ and $B_{h \times b}$ (where $h \ll a, b$) that act as adapters for gradients to flow through them. The output of the layer then can be calculated as -</p>
+<p>\[Y = XW + XAB\]</p>
+<p>Where the weights in W are kept frozen, while A and B are updated.</p>
+<h3 id="quickoverviewofquantization">Quick overview of Quantization</h3>
+<p>With Quantization, we attempt to reduce the precision required per parameter value to save memory/speed up calculations, without sacrificing the information per bit too much. This is generally done through scaling floats within a discretized range, while taking care of outliers by doing it in a block-wise fashion. Not going into the details here, link attached below.</p>
+<p>Quantization significantly speeds up inference of models and makes them more accessible to a wide range of machines (even raspberry pis somehow). However finetuning a quantized LLM results in a significantly decreased performance compared to finetuning pre-quantization (which is obviously more expensive and inaccessible).</p>
+<h3 id="qlora">QLoRA</h3>
+<p>Quantized LLMs can be combined with LoRA adapters 🥳</p>
+<p>Essentially, QLoRA uses 2 precision types - 4 bit for storage (general transformer weights) and 16 bit for computation (through dequantization). 
+The gradients are only computed for the LoRA adapters which use 16 bit always. Computationally - </p>
+<p>\[Y^{16} = X^{16} dequant'(W^4) + X^{16} A^{16} B^{16}\]</p>
+<p>Where the superscripts represent the representation. (The $dequant'$ function is not the standard dequantization, and is explained further on here.)</p>
+<h3 id="tricksused">Tricks used</h3>
+<p>The paper highlights some tricks and optimizations used for preserving memory and improving precision.</p>
+<p>[TODO]</p>
       </div>
       <div id="not-mobile" class="col">
       </div>

@@ -55,7 +55,22 @@
         <a href="../index.html"><i class="fa-solid fa-chevron-left"></i></a>
       </div>
       <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
-          <!-- POST_CONTENT -->
+          <h1 id="howdidtransformersgetthisgood">How did transformers get this good?</h1>
+<p>175B params and <code>RLHF</code>.</p>
+<h2 id="rlhf">RLHF</h2>
+<h3 id="1hfpart">1. HF part</h3>
+<ul>
+<li><p>It requires an already pre-trained LLM (GPT-3.5 in ChatGPT's case) along with another LM of a size $\le$ to the former. The output for the second LM is a scalar (to allow RL).</p></li>
+<li><p>The dataset for training the latter LM (or RM, for Reward Model) needs to be curated through human annotators and it should contain prompt-[list of generations] pairs. To do this, prompts are sampled from a collection of past user queries. These prompts are used to generate text using the original large LM.</p></li>
+<li><p>This is followed by humans manually ranking the text generations for each prompt. Humans don't directly score the text for the reward model as it'll lead to noise and bias propagation apparently. One way to do this ranking is simple head to head ELO. These scores (possibly ELO) are normalized to scalar values as reward signals. These sample-reward pairs are then used to train the RM.</p></li>
+</ul>
+<h3 id="2rlpart">2. RL part</h3>
+<ul>
+<li><p>Policy - A copy of the initial LM (with some weights frozen for cost reasons). Takes prompt and returns probability distributions over text.</p></li>
+<li><p>Reward function calculation - Use a prompt $X$ to generate texts $y_1, y_2$ from the initial and copied model (policy) respectively. Use the RM to calculate the "preferability" - $r_{\theta}$ and use $y_1$ to calculate scaled KL-divergence and get a score $r_{KL}$. The latter acts as a counterbalance to ensure the policy does not drift away to exploit the reward. The final reward is calculated as $r = r_{theta} - \lambda r_{KL}$ (although companies would have more secret sauces to this).</p></li>
+<li><p>Finally update the policy. The gradient changes are likely clipped to avoid RL shenanigans and freezing params also allows for some degree of regularization I guess over being cost effective.</p></li>
+</ul>
+<p>[1] Lambert, et al., "Illustrating Reinforcement Learning from Human Feedback (RLHF)", Hugging Face Blog, 2022.</p>
       </div>
       <div id="not-mobile" class="col">
       </div>

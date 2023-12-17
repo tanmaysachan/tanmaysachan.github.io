@@ -55,7 +55,27 @@
         <a href="../index.html"><i class="fa-solid fa-chevron-left"></i></a>
       </div>
       <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
-          <!-- POST_CONTENT -->
+          <h1 id="bewareofcalloverheads">Beware of call overheads</h1>
+<p>String functions are a prevalent bottleneck in high performance routines, due to which functions like C's <code>strcmp</code> are written in 
+hand optimized <a href="https://sourceware.org/git/?p=glibc.git;a=blob;f=sysdeps/x86_64/strcmp.S;h=c5c44d4e27710c0c335f581cf42de37b3eefc9f4;hb=fdfc9260b61d3d72541f18104d24c7bcb0ce5ca2">assembly</a>.</p>
+<p><code>strcmp</code> quits as soon as a character mismatch is detected in the string. The following loop is used to benchmark its performance:  </p>
+<pre><code class="C++ language-C++">volatile int common_strings = 0;
+for (int i = 0; i &lt; N; i++)
+    for (int j = 0; j &lt; N; j++)
+        if (!strcmp(strs[i], strs[j]))
+            common_strings++;
+</code></pre>
+<p><br />
+Runtime for N = 50000: 11.24 seconds</p>
+<p>While it is performant, if the hit rate is low (eg - associative array), a simple first char check ends up giving a 2x performance boost:</p>
+<pre><code class="C++ language-C++">volatile int common_strings = 0;
+for (int i = 0; i &lt; N; i++)
+    for (int j = 0; j &lt; N; j++)
+        if (*strs[i] == *strs[j] &amp;&amp; !strcmp(strs[i], strs[j]))
+            common_strings++;
+</code></pre>
+<p><br />
+Runtime for N = 50000: 4.84 seconds</p>
       </div>
       <div id="not-mobile" class="col">
       </div>

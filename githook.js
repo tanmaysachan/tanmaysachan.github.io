@@ -1,57 +1,124 @@
 #!/usr/bin/env node
 
-console.log('Hello, world!,');
+// Git post-commit hook to convert Markdown files to HTML
+// Also injects the HTML into the index.html file
+//
+// Add this to your .git/hooks/post-commit file:
+// #!/bin/sh
+// ./githook.js
 
-// const fs = require('fs');
-// const path = require('path');
-// const showdown  = require('showdown');
-// const converter = new showdown.Converter();
+const fs = require('fs');
+const path = require('path');
+const showdown  = require('showdown');
+const converter = new showdown.Converter();
 
-// function convertFolderMdToHtml(sourceFolder, destinationFolder) {
-//   // Read files from the source folder
-//   fs.readdir(sourceFolder, (err, files) => {
-//     if (err) {
-//       console.error('Error reading folder:', err);
-//       return;
-//     }
+function convertFolderMdToHtml(sourceFolder, destinationFolder) {
+  fs.readdir(sourceFolder, (err, files) => {
+    if (err) {
+      console.error('Error reading folder:', err);
+      return;
+    }
+    files.forEach(file => {
+      const sourceFilePath = path.join(sourceFolder, file);
+      if (fs.statSync(sourceFilePath).isFile()) {
+        fs.readFile(sourceFilePath, 'utf8', (readErr, data) => {
+          if (readErr) {
+            console.error(`Error reading file ${sourceFilePath}:`, readErr);
+            return;
+          }
 
-//     // Iterate through each file
-//     files.forEach(file => {
-//       const sourceFilePath = path.join(sourceFolder, file);
-
-//       // Check if it's a file (not a subdirectory)
-//       if (fs.statSync(sourceFilePath).isFile()) {
-//         // Read the content of the file
-//         fs.readFile(sourceFilePath, 'utf8', (readErr, data) => {
-//           if (readErr) {
-//             console.error(`Error reading file ${sourceFilePath}:`, readErr);
-//             return;
-//           }
-
-//           // Convert Markdown to HTML
-//           var htmlContent = converter.makeHtml(data);
+          var htmlContent = converter.makeHtml(data);
           
-//           htmlContent = htmlContent.replaceAll('<em>', '_');
-//           htmlContent = htmlContent.replaceAll('</em>', '_');
+          htmlContent = htmlContent.replaceAll('<em>', '_');
+          htmlContent = htmlContent.replaceAll('</em>', '_');
+
+          // Read the template file
+          const templateFilePath = './post.html';
+          fs.readFile(templateFilePath, 'utf8', (readErr, data) => {
+            if (readErr) {
+              console.error(`Error reading file ${templateFilePath}:`, readErr);
+              return;
+            }
+            htmlContent = data.replace('<!-- POST_CONTENT -->', htmlContent);
         
-//           // Determine the destination file path
-//           const destinationFilePath = path.join(destinationFolder, file.replace(/\.md$/, '.html'));
+            const destinationFilePath = path.join(destinationFolder, file.replace(/\.md$/, '.html'));
 
-//           // Save the HTML content to the destination file
-//           fs.writeFile(destinationFilePath, htmlContent, 'utf8', writeErr => {
-//             if (writeErr) {
-//               console.error(`Error writing HTML file ${destinationFilePath}:`, writeErr);
-//             } else {
-//               console.log(`Conversion successful: ${sourceFilePath} => ${destinationFilePath}`);
-//             }
-//           });
-//         });
-//       }
-//     });
-//   });
-// }
+            fs.writeFile(destinationFilePath, htmlContent, 'utf8', writeErr => {
+              if (writeErr) {
+                console.error(`Error writing HTML file ${destinationFilePath}:`, writeErr);
+              } else {
+                console.log(`Conversion successful: ${sourceFilePath} => ${destinationFilePath}`);
+              }
+            });
+          });
+        });
+      }
+    });
+  });
+}
 
-// // Example usage: Provide the paths to the source and destination folders
-// const sourceFolderPath = './posts_md';
-// const destinationFolderPath = './posts_html';
-// convertFolderMdToHtml(sourceFolderPath, destinationFolderPath);
+const sourceFolderPath = './posts_md';
+const destinationFolderPath = './posts_html';
+convertFolderMdToHtml(sourceFolderPath, destinationFolderPath);
+
+function replaceBetween(originalString, startSubstring, endSubstring, replacement) {
+  const startIndex = originalString.indexOf(startSubstring);
+  const endIndex = originalString.indexOf(endSubstring, startIndex + startSubstring.length);
+
+  if (startIndex !== -1 && endIndex !== -1) {
+    const prefix = originalString.substring(0, startIndex + startSubstring.length);
+    const suffix = originalString.substring(endIndex);
+
+    return prefix + replacement + suffix;
+  } else {
+    return originalString;
+  }
+}
+
+function readFilesAndGenerateHtml(directoryPath) {
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
+      console.error('Error reading directory:', err);
+      return;
+    }
+
+    files.sort((a, b) => {
+      const numA = parseInt(a.split('.')[0]);
+      const numB = parseInt(b.split('.')[0]);
+
+      return numB - numA;
+    });
+
+    const sortedFiles = files.map(file => {
+      const [num, title] = file.split('.', 2);
+      return [num, title];
+    });
+
+    var htmlList = '\n';
+    sortedFiles.forEach(([num, title]) => {
+      var enc_title = encodeURIComponent(title);
+      htmlList += `  <li><a href="posts_html/${num}.${enc_title}.html">${title}</a></li>\n`;
+    });
+    htmlList += '\n';
+
+    const indexPath = './index.html';
+    fs.readFile(indexPath, 'utf-8', (err, data) => {
+      if (err) {
+        console.error('Error reading index.html file:', err);
+        return;
+      }
+
+      const modifiedHtml = replaceBetween(data, '<!-- POST_LIST_PLACEHOLDER_START -->', '<!-- POST_LIST_PLACEHOLDER_END -->', htmlList);
+
+      fs.writeFile(indexPath, modifiedHtml, 'utf-8', err => {
+        if (err) {
+          console.error('Error writing to index.html file:', err);
+        } else {
+          console.log('HTML list injected into index.html successfully!');
+        }
+      });
+    });
+  });
+}
+
+readFilesAndGenerateHtml(destinationFolderPath);

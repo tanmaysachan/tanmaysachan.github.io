@@ -55,7 +55,18 @@
         <a href="../index.html"><i class="fa-solid fa-chevron-left"></i></a>
       </div>
       <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
-          <!-- POST_CONTENT -->
+          <h1 id="mmapandtheconfusionwithllamassparsity"><code>mmap()</code> and the confusion with LLaMa's sparsity</h1>
+<p>A recent article on <a href="https://news.ycombinator.com/item?id=35393284&ref=emergentmind">HN</a> blew up claiming the usage of <code>mmap()</code> had caused a memory usage reduction for LLaMa (30B param variant large language model) inference, and now it was possible to do it with 6GB RAM instead of $\ge$ 30GB to load weights and activations. Even quantized to 4-bit integers, it would still require $\ge$ 17GB to fully load the model, but maybe loading it fully isn't necessary? (it actually is)</p>
+<h3 id="mmap"><code>mmap()</code></h3>
+<p>It is used to create a mapping in the virtual address space of the process that calls it. This mapping can be to a file or a device, and they might require far more memory than is available, which is allotted to them in the virtual space. The OS handles the memory accesses on demand, using swap space and caching.</p>
+<p>Using <code>mmap()</code> for loading LLaMa 30B resulted in a reported memory consumption of only 6GB through htop, which was largely attributed to sparsity within the weights.</p>
+<h3 id="matrixmultiplication">Matrix multiplication</h3>
+<p>In reality, htop seemed to be lacking a reporting of filesystem cache where the entire LLaMa was still being accessed through OS calls.</p>
+<ol>
+<li><p>It is not possible to fix sparsity through <code>mmap()</code>. Transformers are a bunch of stacked matrix multiplications, and you cannot access parts of matrices and multiply them fully.</p></li>
+<li><p>The sparsity claim itself lacks <a href="https://github.com/ggerganov/llama.cpp/discussions/638#discussioncomment-5494574">ground</a>.</p></li>
+</ol>
+<p>Is it beneficial at all then to use <code>mmap()</code>? Turns out yes, since now the model isn't being copied over to memory. Model loading is faster, and subsequent runs make use of caching through OS. However the inference time takes a massive hit due to constant disk reads.</p>
       </div>
       <div id="not-mobile" class="col">
       </div>

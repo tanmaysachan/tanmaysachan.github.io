@@ -55,7 +55,58 @@
         <a href="../index.html"><i class="fa-solid fa-chevron-left"></i></a>
       </div>
       <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
-          <!-- POST_CONTENT -->
+          <h1 id="contravarianceandprofunctors">Contravariance and Profunctors</h1>
+<h4 id="functor">Functor</h4>
+<p>Functors are used to map categories. In haskell they are defined as:</p>
+<pre><code class="haskell language-haskell">class Functor f where
+    fmap :: (a -&gt; b) -&gt; f a -&gt; f b
+</code></pre>
+<p>And they follow the laws:  </p>
+<ol>
+<li><code>fmap id = id</code></li>
+<li><code>fmap (g . f) = fmap g . fmap f</code></li>
+</ol>
+<h4 id="bifunctor">Bifunctor</h4>
+<p>Bifunctor is a functor whose domain is a product category. A functor $F: C_1 \times C_2 \rightarrow D$ is a Bifunctor.</p>
+<pre><code class="haskell language-haskell">class Bifunctor f where
+    bimap :: (a -&gt; c) -&gt; (b -&gt; d) -&gt; f a b -&gt; f c d
+</code></pre>
+<p>they also follow similar laws:  </p>
+<ol>
+<li><code>bimap id id = id</code></li>
+<li><code>bimap (f . g) (h . i) = bimap f h . bimap g i</code></li>
+</ol>
+<h2 id="contravariance">Contravariance</h2>
+<p>When we have some functor $F: C \rightarrow D$, $F$ is covariant to objects in $C$. Covariance and Contravariance here can be differentiated through type <a href="https://ncatlab.org/nlab/show/polarity+in+type+theory">polarity</a>, which essentially states whether the type is the output or the input to a function.</p>
+<p>Example of contravariant object:  </p>
+<pre><code class="haskell language-haskell">newtype Predicate a = Predicate { runPredicate :: a -&gt; Bool }
+</code></pre>
+<p>We cannot use a functor to map Predicate, since it is <code>Contravariant</code> in type <code>a</code>. Instead, we can introduce "Contravariant functor" to solve this.</p>
+<pre><code class="haskell language-haskell">class Contravariant f where
+    contramap :: (b -&gt; a) -&gt; f a -&gt; f b
+
+instance Contravariant Predicate where
+    contramap f (Predicate p) = Predicate (p . f)
+</code></pre>
+<h2 id="profunctor">Profunctor</h2>
+<p>While a Bifunctor is covariant in its type parameters, a Profunctor is covariant in its right type parameter and contravariant in its left type parameter.</p>
+<pre><code class="haskell language-haskell">class Profunctor p where
+    dimap :: (a -&gt; b) -&gt; (c -&gt; d) -&gt; p b c -&gt; p a d
+</code></pre>
+<p>Laws are similar to bifunctor:  </p>
+<ol>
+<li><code>dimap id id = id</code></li>
+<li><code>dimap (h . f) (g . i) = dimap f g . dimap h i</code></li>
+</ol>
+<p>Profunctors can model the function arrow:</p>
+<pre><code class="haskell language-haskell">instance Profunctor (-&gt;) where
+    dimap ab cd bc = cd . bc . ab
+</code></pre>
+<p><br />
+(Where ab is of type (a -&gt; b), and similarly for cd and bc)</p>
+<p><code>Lens</code> also composes through profunctors, and I'll probably write about it when I understand it better.</p>
+<p>[1] <a href="https://youtu.be/JZPXzJ5tp9w">The extended functor family</a><br />
+[2] Category Theory for Programmers - Bartosz Milewski</p>
       </div>
       <div id="not-mobile" class="col">
       </div>
