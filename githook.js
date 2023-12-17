@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
-// Git post-commit hook to convert Markdown files to HTML
+// Git pre-commit hook to convert Markdown files to HTML
 // Also injects the HTML into the index.html file
 //
-// Add this to your .git/hooks/post-commit file:
+// Add this to your .git/hooks/pre-commit file:
 // #!/bin/sh
 // ./githook.js
+// git add -u
 
 const fs = require('fs');
 const path = require('path');
