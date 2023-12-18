@@ -77,7 +77,7 @@
 <li><code>bimap (f . g) (h . i) = bimap f h . bimap g i</code></li>
 </ol>
 <h2 id="contravariance">Contravariance</h2>
-<p>When we have some functor $F: C \rightarrow D$, $F$ is covariant to objects in $C$. Covariance and Contravariance here can be differentiated through type <a href="https://ncatlab.org/nlab/show/polarity+in+type+theory">polarity</a>, which essentially states whether the type is the output or the input to a function.</p>
+<p>When we have some functor $F: C \rightarrow D$, $F$ is covariant to objects in $C$. Covariance and Contravariance here can be differentiated through type <a href="https://ncatlab.org/nlab/show/polarity+in+type+theory" target="_blank">polarity</a>, which essentially states whether the type is the output or the input to a function.</p>
 <p>Example of contravariant object:  </p>
 <pre><code class="haskell language-haskell">newtype Predicate a = Predicate { runPredicate :: a -&gt; Bool }
 </code></pre>
@@ -105,7 +105,7 @@ instance Contravariant Predicate where
 <p><br />
 (Where ab is of type (a -&gt; b), and similarly for cd and bc)</p>
 <p><code>Lens</code> also composes through profunctors, and I'll probably write about it when I understand it better.</p>
-<p>[1] <a href="https://youtu.be/JZPXzJ5tp9w">The extended functor family</a><br />
+<p>[1] <a href="https://youtu.be/JZPXzJ5tp9w" target="_blank">The extended functor family</a><br />
 [2] Category Theory for Programmers - Bartosz Milewski</p>
       </div>
       <div id="not-mobile" class="col">

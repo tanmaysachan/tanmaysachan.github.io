@@ -33,6 +33,15 @@ function convertFolderMdToHtml(sourceFolder, destinationFolder) {
           htmlContent = htmlContent.replaceAll('<em>', '_');
           htmlContent = htmlContent.replaceAll('</em>', '_');
 
+          // Add 'target="_blank"' to all links
+          htmlContent = htmlContent.replace(/<a\b(?!.*?target="_blank")[^>]*>/g, (match) => {
+            if (match.includes('target=')) {
+              return match.replace(/target=("[^"]*")/, 'target="_blank"');
+            } else {
+              return match.replace('>', ' target="_blank">');
+            }
+          });
+
           // Read the template file
           const templateFilePath = './post.html';
           fs.readFile(templateFilePath, 'utf8', (readErr, data) => {
