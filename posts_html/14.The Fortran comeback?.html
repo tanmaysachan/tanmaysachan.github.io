@@ -56,13 +56,32 @@
         <a href="../index.html"><i class="fa-solid fa-chevron-left"></i></a>
       </div>
       <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
-          <h1 id="volumeofahypersphere">Volume of a Hypersphere</h1>
-<h5 id="lemma">Lemma:</h5>
-<p>$V_N(R) \propto R^N$ where $V_N$ is volume of N-dim hypersphere.<br />
-The proportionality constant is $V_N(1)$, so $V_N(R) = V_N(1) \times R^N$.</p>
-<h5 id="recursiveformula">Recursive formula:</h5>
-<p>$V_N(R) = \frac{2 \pi R^2}{N} \times V_{N-2}(R)$</p>
-<p>Random: A 0-dim hypersphere has <a href="https://math.stackexchange.com/questions/4069997/how-does-a-0-ball-have-volume-1" target="_blank">volume 1</a>.</p>
+          <h1 id="thefortrancomeback">The Fortran comeback?</h1>
+<p>Going through the <a href="https://github.com/llvm/llvm-project" target="_blank">llvm repository</a>, I found ongoing work on "Flang".<br />
+Since "Clang" refers to llvm's C/C++ frontend, I understood that it was probably a frontend of some language that
+started with F, but I did not expect it to be Fortran.  </p>
+<p>Why? - Maybe because of my underlying assumptions about it being an ancient language that I remember being used 
+as an example for an early <a href="https://en.wikipedia.org/wiki/High-level_programming_language" target="_blank">HLL</a> back in my school. So if its not dead, and 
+people are putting work into it, what does it have to offer?</p>
+<p>Aggregating online sentiments (which there are far too many of) - it seems that Fortran is easier to aggressively
+optimize, or, write code in, in a way that is more compiler friendly. It is also more intuitive and feature-rich for numericals.</p>
+<h4 id="arrayoptimizations">Array optimizations</h4>
+<p>Being suited for numerical programming, it has a neat array model which users directly manipulate. This facilitates
+straightforward vectorization.  </p>
+<p>There also exists native parallel support (<code>do parallel</code>) and distributed support in the language for numerical ops.</p>
+<h4 id="stricteraliasingrules">Stricter aliasing rules</h4>
+<p>Def: Pointer aliasing - It refers to the fact that 2 pointers in a language like C/C++ can point to the same memory location,
+which kills a lot of optimization opportunities - for example constant propagation and code reordering can create unintended
+changes to the underlying memory.</p>
+<p>Fortran has strict aliasing rules, which assume by default that no two areas pointed to are overlapping. C99 however already has
+a similar functioning <code>restrict</code> keyword in place, and major C++ compilers offer similar attributes (though not part of the standard).
+Having it as a default enables its usage better I suppose.</p>
+<h4 id="portabilityabstractioninteroperability">Portability, Abstraction, Interoperability</h4>
+<p>This is probably the main reason. The huge pile of abstractions makes debugging and reasoning about computations far easier,
+along with adding portability. Pair that with its performance and interoperability with C/C++ and you have a language that can be used
+to extend functionality of existing systems without sacrificing performance or having hardware savvy people care about math (or having
+math people care about hardware).</p>
+<p>Seems like a good language to dive into over a weekend.</p>
       </div>
       <div id="not-mobile" class="col">
       </div>
