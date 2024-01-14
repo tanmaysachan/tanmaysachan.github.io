@@ -56,7 +56,19 @@
         <a href="../index.html"><i class="fa-solid fa-chevron-left"></i></a>
       </div>
       <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
-          
+          <h1 id="threadscannotbeimplementedasalibrary">"Threads cannot be implemented as a library"</h1>
+<p>We often take multi-threading for granted, given its prevalence in modern systems. But the more I read about
+it, the scarier it gets. Data races are ridiculously tricky, and designing language specs around it even more
+so.</p>
+<p>I was recently reading a paper(title is the same as this post's[1]) which goes into
+depth about why optimizing compilers find dealing with multi-threading exceptionally hard - especially arguing
+that creation of thread functionality as a library (i.e. uninvolved with the compiler implementation) is
+impossible.  </p>
+<p>Multithreading as a feature must be baked into the language, the earlier in its life-cycle, the better (which
+tells us why C/C++ data race specs pre-2011 were just UB, Java's are still ridiculously complex,
+and Rust's are good).</p>
+<h4 id="bibliography">Bibliography</h4>
+<p>[1] <a href="https://dl.acm.org/doi/10.1145/1065010.1065042" target="_blank">Threads cannot be implemented as a library</a></p>
       </div>
       <div id="not-mobile" class="col">
       </div>
