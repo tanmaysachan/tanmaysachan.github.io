@@ -66,6 +66,53 @@ impossible.  </p>
 <p>Multithreading as a feature must be baked into the language, the earlier in its life-cycle, the better (which
 tells us why C/C++ data race specs pre-2011 were just UB, Java's are still ridiculously complex,
 and within safe Rust they're impossible to create).</p>
+<h4 id="drfsc">DRF =&gt; SC</h4>
+<p>Any program that is free from data races must be sequentially consistent (i.e. the instructions for each thread
+must come together in an interleaved but causal fashion).</p>
+<h4 id="optimizationfailexample">Optimization fail example</h4>
+<pre><code class="python language-python">y = 0, x = 0
+
+# Thread 1
+if (y == 1)
+    x += 1
+
+# Thread 2
+if (x == 1)
+    y += 1
+</code></pre>
+<p>This code should ideally do nothing, x and y will never be 1.<br />
+If we assume no compiler involvement in the threading,
+i.e. the compiler sees the two thread instructions in isolation and tries to optimize,
+a perfectly valid optimization might be the following -</p>
+<pre><code class="python language-python">y = 0, x = 0
+
+# Thread 1
+x += 1
+if (y != 1)
+    x -= 1
+
+# Thread 2
+y += 1
+if (x != 1)
+    y -= 1
+</code></pre>
+<p>This program is still identical in its behaviour for each thread.
+Now however, we can see that interleaving the two thread instructions can cause x and y both to be 1 - </p>
+<pre><code class="python language-python">y = 0, x = 0
+
+# Thread 1
+x += 1        # x == 1
+
+# Thread 2
+y += 1        # y == 1
+if (x != 1)
+    y -= 1    # y does not get decremented
+
+# Thread 1 contd.
+if (y != 1)
+    x -= 1    # x does not get decremented either
+</code></pre>
+<p>This is invalid.</p>
 <h4 id="bibliography">Bibliography</h4>
 <p>[1] <a href="https://dl.acm.org/doi/10.1145/1065010.1065042" target="_blank">Threads cannot be implemented as a library</a></p>
       </div>
