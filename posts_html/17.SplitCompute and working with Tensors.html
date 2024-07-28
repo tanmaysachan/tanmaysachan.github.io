@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../styles.css">
+    <meta name="google-site-verification" content="LM4GhB5Y1CsiX4EhmQygTx1arB_gKDc0wQjpK2MFTOs" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    
+    <!-- Rubik font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+    <script src="../loader.js"></script>
+
+    <script src="https://kit.fontawesome.com/9016fec2c3.js" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autorun=false"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="../assets/favicon_io/site.webmanifest" crossorigin="use-credentials">
+
+    <title>A small collection</title>
+  </head>
+  <body>
+    <div class="container col-sm" id="site-header">
+    </div>
+    <div class="container row" id="shareable-box">
+      <div class="col">
+        <!-- <a id="shareable-link" href="javascript:void(0);"><i class="fa-solid fa-link"></i> Copy shareable link for this write-up</a> -->
+      </div>
+    </div>
+    <div class="row" id="content-block">
+      <div class="col-xs" id="back-button">
+        <a href="../index.html"><i class="fa-solid fa-chevron-left"></i></a>
+      </div>
+      <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
+          <h1 id="splitcomputeandworkingwithtensors">SplitCompute and working with Tensors</h1>
+<p>SplitCompute - <a href="https://github.com/tanmaysachan/splitcompute" target="_blank">github link</a></p>
+<p>So for the last week or so I had been working on this project I called "SplitCompute", with the intention of
+sharding neural networks between the cloud and the edge. This could potentially allow low to no cloud GPU costs
+for inference on such models.</p>
+<p>The idea behind sharding, instead of just transferring, was also because no one wants 5-10GB of models being
+downloaded on their browsers, and being attempted to run. ML on the edge is definitely getting better
+but it is still not very feasible because of the transfer and compute requirements.</p>
+<p>For the most part, the project turned out successful - for arbitrary embedding based models, you can use
+the components and get it to work.
+The problem with the project turned out to be the problem I was set to solve - wasn't really one :(</p>
+<h3 id="thecore">The Core</h3>
+<h5 id="whywebgputorch">Why webgpu-torch</h5>
+<p>While looking for ways to run neural networks on the browser, I stumbled upon some of Karpathy's <a href="https://cs.stanford.edu/people/karpathy/convnetjs/" target="_blank">work</a>
+because obviously he had tried to do this 11 Years ago. It was some pure JS, which was still quite performant. I was looking for something lower level still.</p>
+<p>ONNX runtime is another popular choice to run models, but I was unsure how to shard the NNs with it. Moreover its performance was also dubious from
+what I read on online forums.</p>
+<p>Eventually I stumbled upon a unfinished library with torch-like API written in TS - <a href="https://github.com/praeclarum/webgpu-torch" target="_blank">webgpu-torch</a>.
+It was full of bugs and incomplete code, but it felt like a good exercise to fix and extend it, so I went along with it.</p>
+<p>When it did work, it was really fast - fast enough to not impact UX.</p>
+<h5 id="howitworks">How it works</h5>
+<p>Webgpu-torch uses lazy buffers to handle tensors - each being associated with a computation graph. The computation graph is compiled to kernels, which are really
+just WGSL strings containing bindings and ops.</p>
+<p>The library does no kernel fusion at the moment, though I'm planning to add that when I get the time. <a href="https://github.com/tinygrad/tinygrad" target="_blank">Tinygrad</a> has already
+done most of this.</p>
+<h3 id="theproblemwiththeproblem">The problem with the problem</h3>
+<p>It was always a benefit-convenience tradeoff, but the benefit is far smaller than I expected. GPU costs for embedding models aren't really that big of a concern
+for most commercial users, and the complexity far outweighs the pros.</p>
+<p>Overall it was a fun week or two. Was also nice to dive into various tensor library internals, find a LOT of absolute slop (tensorflow).</p>
+      </div>
+      <div id="not-mobile" class="col">
+      </div>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
