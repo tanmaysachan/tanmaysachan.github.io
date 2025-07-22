@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../styles.css">
+    <meta name="google-site-verification" content="LM4GhB5Y1CsiX4EhmQygTx1arB_gKDc0wQjpK2MFTOs" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    
+    <!-- Rubik font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+    <script src="../loader.js"></script>
+
+    <script src="https://kit.fontawesome.com/9016fec2c3.js" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autorun=false"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="../assets/favicon_io/site.webmanifest" crossorigin="use-credentials">
+
+    <title>A small collection</title>
+  </head>
+  <body>
+    <div class="container col-sm" id="site-header">
+    </div>
+    <div class="container row" id="shareable-box">
+      <div class="col">
+        <!-- <a id="shareable-link" href="javascript:void(0);"><i class="fa-solid fa-link"></i> Copy shareable link for this write-up</a> -->
+      </div>
+    </div>
+    <div class="row" id="content-block">
+      <div class="col-xs" id="back-button">
+        <a href="../index.html"><i class="fa-solid fa-chevron-left"></i></a>
+      </div>
+      <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
+          <h1 id="busybeavers">Busy Beavers</h1>
+<p>Nerd-sniped by a half cooked math hackernews comment, I spent a few hours writing and visualizing a busy beaver simulator. Anyways, the theory is much cooler.</p>
+<h3 id="whatisabusybeavernumber">What is a Busy Beaver number</h3>
+<p>It's a <code>finite</code> number that represents the maximum number of steps a Turing machine with <code>n</code> states can take before halting.
+The Busy Beaver function is denoted as <code>BB(n)</code>.</p>
+<p>BB(1) = 1, BB(2) = 4, BB(3) = 6, BB(4) = 13, BB(5) = 47176870</p>
+<p>BB(6) had an earlier lower bound of $10^{18267}$ which has since been updated to be <a href="https://www.reddit.com/r/math/comments/xz7si4/%CF%836_the_6th_busy_beaver_number_is_far_larger_than/" target="_blank">far, far larger</a>.</p>
+<h3 id="whyisitinteresting">Why is it interesting</h3>
+<p>BB increases quick, in fact it is the fastest increasing function possible. Why?</p>
+<p>Let's say there exists another function (F) which upper bounds BB. Which implies that for any turing machine with <code>k</code> states, you
+can say that it will run for a maximum number of <code>F(k)</code> steps before halting. If it runs for more than that, you can conclude
+that the machine must never halt.</p>
+<p>This sounds an awful lot like a solution for the halting problem.</p>
+<h3 id="bb6issobigimaginehowbigbb1000willbe">BB(6) is so big, imagine how big BB(1000) will be!</h3>
+<p>We'll actually never know. Not because it is too big, but because we simply cannot compute it even with infinite time and memory.</p>
+<p>Some crazy people have actually brought the upper bound for the largest BB number we can compute down to just 747.
+Which means that we cannot ever compute BB(748).</p>
+<p>A turing machine with 748 states doesn't sound like much at all - and <a href="https://turingmachinesimulator.com/shared/vgimygpuwi" target="_blank">here it is</a>.</p>
+<h3 id="whywillbb748disproveourmathematics">Why will BB(748) disprove our mathematics</h3>
+<p>(Not going into how the upper bound was lowered to an oddly specific 748, because I do not understand it.)</p>
+<p>ZFC is the standard set of axioms that we base our mathematics on. It is a set of axioms that we believe
+to be consistent and can be used to prove all the theorems we have proven so far, and more.</p>
+<p>What does it mean for a set of axioms to be consistent? - it means that using this set, we should never be
+able to prove both a statement and its negation.</p>
+<p>Godel proved that if ZFC is in fact consistent, it will never be able to prove its own consistency. This
+is Godel's second incompleteness theorem.</p>
+<p>Now let's say we have a turing machine that takes the axioms present in ZFC and starts enumerating all the provable statements
+one by one. By Godel's theorem, ZFC can't prove if this machine will ever halt, as we just read above. The authors
+managed to bring the number of states required to build such a machine down to just 748 - which means that if
+via ZFC we ever could calculate BB(748), we could just run this machine for BB(748) number of steps and prove ZFC's consistency.</p>
+<p>It blows my mind that this is a finite number by definition, that we can never compute without disproving our entire mathematical
+foundation!</p>
+      </div>
+      <div id="not-mobile" class="col">
+      </div>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
