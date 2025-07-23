@@ -68,21 +68,21 @@ The Busy Beaver function is denoted as <code>BB(n)</code>.</p>
 <p>Let's say there exists another function (F) which upper bounds BB. Which implies that for any turing machine with <code>k</code> states, you
 can say that it will run for a maximum number of <code>F(k)</code> steps before halting. If it runs for more than that, you can conclude
 that the machine must never halt.</p>
-<p>This sounds an awful lot like a solution for the halting problem.</p>
+<p>This sounds an awful lot like a solution for the halting problem, which Turing proved to be undecidable in 1936.</p>
 <h3 id="bb6issobigimaginehowbigbb1000willbe">BB(6) is so big, imagine how big BB(1000) will be!</h3>
 <p>We'll actually never know. Not because it is too big, but because we simply cannot compute it even with infinite time and memory.</p>
 <p>Some crazy people have actually brought the upper bound for the largest BB number we can compute down to just 747.
 Which means that we cannot ever compute BB(748).</p>
 <p>A turing machine with 748 states doesn't sound like much at all - and <a href="https://turingmachinesimulator.com/shared/vgimygpuwi" target="_blank">here it is</a>.</p>
 <h3 id="whywillbb748disproveourmathematics">Why will BB(748) disprove our mathematics</h3>
-<p>ZFC is the standard set of axioms that we base our mathematics on. It is a set of axioms that we believe
+<p><a href="https://en.wikipedia.org/wiki/Zermelo%E2%80%93Fraenkel_set_theory" target="_blank">ZFC</a> is the standard set of axioms that we base our mathematics on. It is a set of axioms that we believe
 to be consistent and can be used to prove all the theorems we have proven so far, and more.</p>
 <p>What does it mean for a set of axioms to be consistent? - it means that using this set, we should never be
 able to prove both a statement and its negation.</p>
 <p>Godel proved that if ZFC is in fact consistent, it will never be able to prove its own consistency. This
-is Godel's second incompleteness theorem.</p>
+is Godel's <a href="https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems" target="_blank">second incompleteness theorem</a>.</p>
 <p>Now let's say we have a turing machine that takes the axioms present in ZFC and starts enumerating all the provable statements
-one by one. By Godel's theorem, ZFC can't prove if this machine will ever halt, as we just read above. The authors
+one by one. By Godel's theorem, ZFC can't prove if this machine will ever halt (as halting would imply ZFC proving its consistency). The authors
 managed to bring the number of states required to build such a machine down to just 748 - which means that if
 via ZFC we ever could calculate BB(748), we could just run this machine for BB(748) number of steps and prove ZFC's consistency.</p>
 <p>It blows my mind that this is a finite number by definition, that we can never compute without disproving our entire mathematical
