@@ -102,6 +102,14 @@
     if i == 0:
         out = cache
 </code></pre>
+<hr />
+<p><strong>Update:</strong> An even faster approach for the final warp reduction is using <a href="https://developer.nvidia.com/blog/using-cuda-warp-level-primitives/" target="_blank">warp shuffle</a> intrinsics (<code>__shfl_down_sync</code>). These allow threads within a warp to directly exchange register values without going through shared memory at all. Since there's no shared memory access and no synchronization overhead (warps execute in lockstep), shuffle-based reductions have significantly lower latency. For a warp reduction, you'd do something like:</p>
+<pre><code class="cpp language-cpp">// Warp-level reduction using shuffles
+for (int offset = 16; offset &gt; 0; offset &gt;&gt;= 1) {
+    val += __shfl_down_sync(0xffffffff, val, offset);
+}
+</code></pre>
+<p>This is the go-to approach for modern CUDA reduction kernels.</p>
       </div>
       <div id="not-mobile" class="col">
       </div>
