@@ -132,3 +132,54 @@ function readFilesAndGenerateHtml(directoryPath) {
 }
 
 readFilesAndGenerateHtml(destinationFolderPath);
+
+function generateSitemap(directoryPath) {
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
+      console.error('Error reading directory for sitemap:', err);
+      return;
+    }
+
+    files.sort((a, b) => {
+      const numA = parseInt(a.split('.')[0]);
+      const numB = parseInt(b.split('.')[0]);
+      return numB - numA;
+    });
+
+    const baseUrl = 'https://tanmaysachan.github.io';
+    
+    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${baseUrl}/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+`;
+
+    files.forEach(file => {
+      const htmlFileName = file.replace(/\.md$/, '.html');
+      const encodedFileName = encodeURIComponent(htmlFileName).replace(/%2F/g, '/');
+      sitemap += `  <url>
+    <loc>${baseUrl}/posts_html/${encodedFileName}</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+`;
+    });
+
+    sitemap += `</urlset>
+`;
+
+    const sitemapPath = './sitemap.xml';
+    fs.writeFile(sitemapPath, sitemap, 'utf-8', err => {
+      if (err) {
+        console.error('Error writing sitemap.xml:', err);
+      } else {
+        console.log('sitemap.xml generated successfully!');
+      }
+    });
+  });
+}
+
+generateSitemap(destinationFolderPath);

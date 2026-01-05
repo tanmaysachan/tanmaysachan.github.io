@@ -1,0 +1,7 @@
+# robots.txt for tanmaysachan.github.io
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://tanmaysachan.github.io/sitemap.xml
+
