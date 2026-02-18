@@ -6,6 +6,11 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://tanmaysachan.github.io/posts_html/22.Tinkering%20with%20CTMs.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://tanmaysachan.github.io/posts_html/21.Zsh%20being%20a%20pain.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

@@ -90,60 +90,54 @@
         <a href="../index.html"><i class="fa-solid fa-chevron-left"></i></a>
       </div>
       <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
-          <h1 id="fastarraysummationwithcuda">Fast array summation with CUDA</h1>
-<p>Slowest to Fastest:  </p>
+          <h1 id="tinkeringwithctms">Tinkering with CTMs</h1>
+<p>CTM == <a href="https://arxiv.org/abs/2505.05522" target="_blank">Continuous thought machines</a></p>
+<p>This is a rather recent paper by Sakana AI, making strides towards brain-inspired neural architectures. As of late, I've enjoyed playing
+around with models inspired by the "real world". They propose some really cool ideas!</p>
+<p>The novelty of CTM is the introduction of time as fundamental part of model identity, and not something of an afterthought (with concepts like Time2Vec).
+CTMs think in "ticks", growing confident overtime as they grok the problem statement.</p>
+<p><img src="../assets/23597.gif" alt="CTM demo GIF" style="max-width: 280px; width: 100%; height: auto;" /></p>
+<p>Architecturally they propose 2 new ideas -</p>
 <ol>
-<li>Naive atomic add with each thread.</li>
-<li><a href="https://en.wikipedia.org/wiki/Prefix_sum#Parallel_algorithms" target="_blank">Parallel reduction</a>.</li>
-<li>Removing slow operations (modulo in divergent branches).</li>
-<li>Use <code>2</code> with sequential addressing.</li>
-<li>Perform first reduction when reading globally.</li>
+<li>Neuron Level Models - Each "neuron" is actually a deep MLP, which takes new inputs along with a window of its past activations (as to reflect on its decisions).</li>
+<li>Latent representation via synchronization - The actual representation used for solving the task is derived via synchronization of Neurons.</li>
 </ol>
-<p>Further removing instruction bottlenecks:  </p>
-<ol start="6">
-<li>Bottleneck through loop overheads - unroll loops.  </li>
-<li>C++ CUDA has templating for compile time block size detection - can be used to fully unroll loops.  </li>
+<p>Input data from the problem statement almost feels like an afterthought - and is introduced as queries to an attention block.</p>
+<p><img src="../assets/architecture.jpeg" alt="CTM architecture" style="max-width: 400px; width: 100%; height: auto;" /></p>
+<p>They go into a lot of depth in the paper about how this stuff comes together, and how they are able to induce reasoning to solve tasks such as mazes solely
+as an artifact of architecture. Pretty cool!</p>
+<p>It even learns how to solve mazes of size greater than it was exposed to in the training set.</p>
+<p><img src="../assets/maze-solve.gif" alt="CTM maze solve demo" style="max-width: 280px; width: 100%; height: auto;" /></p>
+<h2 id="neuronsconnect">Neurons, connect?</h2>
+<p>I was curious as to why neurons did not have a way of passing around information. If one neuron fires, what if it was able to tell the other to fire a little harder?
+This got me looking into what "muscle memory" really is.</p>
+<p>Muscle Memory happens when repeated, deliberate practice enforces inter-neuronal connections. Spike-timing-dependent-plasticity (STDP) is the process
+that enables it.</p>
+<p>The obvious question was - can I simulate this?</p>
+<p>I got to work to understand what muscle memory in maze solving might look like. Asking a couple people to solve mazes -</p>
+<ol>
+<li>People with lower hand-eye coordination were able to craft shorter traces towards the solutions.</li>
+<li>People with better coordination (mostly video game enthusiasts) were able to take longer strides towards the solution.</li>
 </ol>
-<p>NUMBA code (possible off-by-1s):  </p>
-<pre><code class="python language-python">def reduce(out, a, size):
-    # TPB = threads per block
-    cache = cuda.shared.array(TPB, numba.float32)
-    i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
-    local_i = cuda.threadIdx.x
-
-    stride = TPB//2
-    # First reduction on global read
-    if i + stride &lt; size:
-        cache[local_i] = a[i] + a[i + stride]
-    cuda.syncthreads()
-
-    # Sequential addressing with thread-ids
-    while stride &gt; 32:
-        if local_i &lt; stride:
-            cache[local_i] = cache[local_i] + cache[local_i + stride]
-        cuda.syncthreads()
-        stride &gt;&gt;= 1
-
-    # Only 1 warp left, so no need to syncthreads()
-    if local_i &lt; 32:
-        if local_i + 32 &lt; TPB: cache[local_i] = cache[local_i] + cache[local_i + 32]
-        if local_i + 16 &lt; TPB: cache[local_i] = cache[local_i] + cache[local_i + 16]
-        if local_i + 8 &lt; TPB: cache[local_i] = cache[local_i] + cache[local_i + 8]
-        if local_i + 4 &lt; TPB: cache[local_i] = cache[local_i] + cache[local_i + 4]
-        if local_i + 2 &lt; TPB: cache[local_i] = cache[local_i] + cache[local_i + 2]
-        if local_i + 1 &lt; TPB: cache[local_i] = cache[local_i] + cache[local_i + 1]
-
-    if i == 0:
-        out = cache
-</code></pre>
-<hr />
-<p><strong>Update:</strong> An even faster approach for the final warp reduction is using <a href="https://developer.nvidia.com/blog/using-cuda-warp-level-primitives/" target="_blank">warp shuffle</a> intrinsics (<code>__shfl_down_sync</code>). These allow threads within a warp to directly exchange register values without going through shared memory at all. Since there's no shared memory access and no synchronization overhead (warps execute in lockstep), shuffle-based reductions have significantly lower latency. For a warp reduction, you'd do something like:</p>
-<pre><code class="cpp language-cpp">// Warp-level reduction using shuffles
-for (int offset = 16; offset &gt; 0; offset &gt;&gt;= 1) {
-    val += __shfl_down_sync(0xffffffff, val, offset);
-}
-</code></pre>
-<p>This is the go-to approach for modern CUDA reduction kernels.</p>
+<p>This got me thinking - what if a CTM with muscle memory is able to solve a maze in fewer steps than a regular CTM?</p>
+<p>I had a lot of failed attempts, which I won't post about here, but I got it to work! I added a weight matrix W which held strength values - how much
+does Neuron i's output affect Neuron j.</p>
+<h4 id="mysolution">My solution</h4>
+<p>I defined an update function for this matrix - The weight increases if Neuron i fired at a tick just before Neuron j; as simple as that.</p>
+<p>Equation:</p>
+<p>$W_{ij}(t+1) = decay \cdot W_{ij}(t) + \alpha \cdot a_i(t-1) \cdot a_j(t)$</p>
+<p>Where W is the weight matrix, decay is a biology inspired temporal phenomenon of neuronal connectivity decaying over time, Alpha is the learning rate
+and $a_i$ and $a_j$ are Neuronal activations at timestamps t-1 and t.</p>
+<h4 id="buthowshouldthisweightmatrixbeutilizedbyaneuron">But how should this weight matrix be utilized by a Neuron?</h4>
+<p>Equation:</p>
+<p>$a'_j = a_j + gate_j \cdot \sum_i \left(a_i \cdot W_{ij}\right)$</p>
+<p>A rather easy equation. I add a learnable $gate_j$ for each Neuron to either fully learn or reject all incoming signal from other neurons - this is not
+learnable at a Neuron-Neuron level, but only at an overall per Neuron level - I did not want to leave the learning in backprop's hands. The idea is to make this interpretable.</p>
+<p>Training this model, I was able to actually see the number of steps to solve a maze drop significantly - especially for harder mazes that required more
+reasoning!</p>
+<p><img src="../assets/combined_process.gif" alt="CTM combined process demo" style="max-width: 280px; width: 100%; height: auto;" /></p>
+<p>GIF of a maze significantly harder than the training solution being solved by Muscle Memory induction in CTMs ^</p>
+<p>Of course this analysis requires more deep diving - but this was a great weekend project. Thanks for reading!</p>
       </div>
       <div id="not-mobile" class="col">
       </div>
