@@ -91,24 +91,40 @@
       </div>
       <div class="container float-left col" id="post-block" style="font-family: 'Rubik', sans-serif;">
           <h1 id="turboquantinsights">TurboQuant Insights</h1>
-<p>Recent paper by Google that claims model memory compression by 6x - finally got around to reading it.</p>
+<p>Recent paper by Google that claims model memory compression by 6x - finally got around to reading it.
+A lot of short and quick to digest blogs simplify it a little too much I think (especially glossing over pt 2).</p>
+<ol>
+<li>Rotating vectors randomly before quantizing is not a silver bullet and exploits a key pattern in KV caches, i.e., this works only for KV cache vectors.</li>
+<li>Quantization with or without rotation - is not good enough for dot products and can alter ranking of tokens because of rounding biases.</li>
+</ol>
 <h3 id="idea1">idea #1</h3>
 <p>We want to quantize vectors - but some vectors are hit worse by scale based quantization than others.</p>
 <p>For example, a vector with heavy outliers, something like [0.01, -0.02, -0.001, 0.05, 91.5], has its scale factor
 heavily biased to preserve the outlier. It completely zeros out the other values when quantized via the likes of INT4.
 The KV-cache is full of vectors like this.</p>
-<p>With INT4 quantization, the scale factor would be about 13.05 with the vector as [0, 0, 0, 0, 7].</p>
+<p>With INT4 quantization, the scale factor would be about 13.07 with the vector as [0, 0, 0, 0, 7].</p>
 <p>Btw something like this can be abated by different scale factors for groups of dimensions ^. However as the number of scale factors go up,
 the memory savings go down.</p>
 <p>What this paper proposes (which is apparently not an OG idea) is to randomly rotate these vectors before quantizing. When rotated
 completely randomly, there is very little possibility of the resultant vector possessing outliers of this magnitude - resulting in
-significantly better quantization performance. Moreover, the accuracy loss decreases the number of dimensions go up (seems intuitive).</p>
-<p>Randomly oriented vector for the same [0.01, -0.02, -0.001, 0.05, 91.5] might look something like [12.42, 34.36, 23.26, 21.12, 9.7].
-A quantized version of this vector would have much lower error in attention computation.</p>
+significantly better quantization performance. Moreover, the accuracy loss decreases as the number of dimensions go up (seems intuitive).</p>
+<p>Randomly oriented vector for the same [0.01, -0.02, -0.001, 0.05, 91.5] might look something like [29.5, 44.2, -38.1, 31.6, 55.66], which preserves the same L2 norm.
+Under the same INT4 scheme, this would quantize to roughly [4, 6, -5, 4, 7] with a scale factor of about 7.95, which yields much lower error in attention computation.</p>
+<p>This technique is referred to as PolarQuant.</p>
 <h3 id="idea2">idea #2</h3>
-<p>The technique above minimizes mean squared error between original and quantized vectors, but it sneaks biases between inner products
-(which attention uses between Q and K) which are not random, and thus can stack up deterministically.</p>
-<p>We need QJL here as well (will write later)</p>
+<p>Quantization that leads to minimization of MSE between the original and the new vector does so via smarter rounding, causing values to
+latch onto nearest centroids.</p>
+<p>For example, suppose the quantizer only allows centroids at 0 and 1, and we use a query vector like [1, 1]. Two keys
+[0.49, 0.49] and [0.51, 0.51] are almost the same in the original space, giving inner products of 0.98 and 1.02. But after MSE-optimal
+rounding they become [0, 0] and [1, 1], and now the inner products jump to 0 and 2. So even though the reconstruction error per vector is
+small, the attention score error is not really just noise. It is a result of centroid selection.</p>
+<p>We need to debias this with the smallest memory footprint possible. In turboquant this is done via the creation of a bad but unbiased estimator that consumes
+just 1 bit per dimension. The paper calls it QJL or Quantized Johnson-Lindenstrauss.</p>
+<p>There's some math involved for the exact correction value, and what we get is not even a good estimator, but it is unbiased (with an expected value
+exactly equal to the correction).</p>
+<h3 id="conclusion">Conclusion</h3>
+<p>Turboquant manages to fuse quantization gains with a debiased correction estimator causing accuracy loss to be very minimal. The idea of rotation
+before quantization can also be found in papers like RaBitQ.</p>
       </div>
       <div id="not-mobile" class="col">
       </div>
